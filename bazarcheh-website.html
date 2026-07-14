@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>بازارچه | خرید و فروش آسان</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --green:#059669; --green2:#047857; --gl:#ecfdf5;
+  --ind:#4f46e5; --amb:#d97706; --ambl:#fffbeb;
+  --red:#dc2626; --redl:#fef2f2;
+  --bg:#f5f6fa; --sur:#fff; --ink:#111827;
+  --mid:#4b5563; --dim:#9ca3af; --line:#e5e7eb;
+  --r:14px; --font:'Vazirmatn',sans-serif;
+  --max:1180px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--font);background:var(--bg);color:var(--ink);display:flex;flex-direction:column;min-height:100vh;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,textarea,select{font-family:inherit;}
+img,svg{display:block;}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px;}
+
+/* ── HEADER ── */
+header{
+  background:var(--sur);border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:100;
+  box-shadow:0 1px 8px rgba(0,0,0,.06);
+}
+.hinner{
+  max-width:var(--max);margin:0 auto;padding:0 20px;
+  display:flex;align-items:center;gap:16px;height:64px;
+}
+.logo{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900;}
+.logo-dot{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--green),var(--green2));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 10px rgba(5,150,105,.3);
+}
+.logo-dot svg{width:18px;height:18px;color:#fff;}
+.logo span{color:var(--green);}
+nav{display:flex;gap:4px;margin-right:auto;}
+.nav-a{
+  padding:8px 16px;border-radius:9px;font-size:14px;font-weight:700;
+  color:var(--mid);transition:all .15s;
+}
+.nav-a:hover,.nav-a.on{color:var(--green);background:var(--gl);}
+.nav-post-btn{
+  padding:10px 20px;border-radius:10px;font-size:14px;font-weight:700;
+  background:var(--green);color:#fff;
+  box-shadow:0 3px 10px rgba(5,150,105,.28);
+  transition:all .15s;
+}
+.nav-post-btn:hover{filter:brightness(1.05);transform:translateY(-1px);}
+.hamburger{display:none;flex-direction:column;gap:5px;padding:8px;}
+.hamburger span{width:22px;height:2px;background:var(--ink);border-radius:2px;transition:.2s;}
+.mobile-nav{
+  display:none;background:var(--sur);border-bottom:1px solid var(--line);
+  padding:12px 20px;flex-direction:column;gap:4px;
+}
+.mobile-nav.open{display:flex;}
+@media(max-width:768px){
+  nav{display:none;}
+  .nav-post-btn{display:none;}
+  .hamburger{display:flex;}
+}
+
+/* ── HERO ── */
+.hero{
+  background:linear-gradient(135deg,var(--green) 0%,var(--green2) 100%);
+  color:#fff;padding:56px 20px;text-align:center;
+}
+.hero h1{font-size:clamp(26px,4vw,42px);font-weight:900;margin-bottom:12px;line-height:1.2;}
+.hero p{font-size:16px;opacity:.9;margin-bottom:28px;max-width:560px;margin-inline:auto;line-height:1.7;}
+.hero-search{
+  display:flex;gap:10px;max-width:540px;margin:0 auto;flex-wrap:wrap;justify-content:center;
+}
+.hero-search input{
+  flex:1;min-width:220px;padding:13px 18px;border-radius:12px;border:none;
+  font-family:var(--font);font-size:14.5px;color:var(--ink);
+  box-shadow:0 4px 16px rgba(0,0,0,.15);
+}
+.hero-search input:focus{outline:none;box-shadow:0 4px 20px rgba(0,0,0,.2);}
+.hero-search button{
+  padding:13px 24px;border-radius:12px;background:#fff;color:var(--green);
+  font-weight:800;font-size:14.5px;box-shadow:0 4px 16px rgba(0,0,0,.15);
+  transition:.15s;
+}
+.hero-search button:hover{transform:translateY(-1px);}
+.hero-stats{
+  display:flex;gap:40px;justify-content:center;margin-top:36px;flex-wrap:wrap;
+}
+.hstat{text-align:center;}
+.hstat .num{font-size:24px;font-weight:900;}
+.hstat .lbl{font-size:12px;opacity:.8;margin-top:2px;}
+
+/* ── SECTIONS ── */
+section{padding:48px 0;}
+.sec-title{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;flex-wrap:wrap;gap:10px;
+}
+.sec-title h2{font-size:20px;font-weight:800;}
+.count-pill{
+  font-size:13px;color:var(--mid);background:var(--sur);
+  border:1px solid var(--line);padding:5px 13px;border-radius:999px;
+}
+
+/* ── FILTERS ── */
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;margin-bottom:20px;}
+.filter-row::-webkit-scrollbar{display:none;}
+.chip{
+  padding:7px 16px;border-radius:999px;font-size:13px;font-weight:700;
+  background:var(--sur);border:1.5px solid var(--line);color:var(--mid);
+  white-space:nowrap;transition:.15s;flex-shrink:0;
+}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green);}
+.chip:hover{border-color:var(--green);color:var(--green);}
+.chip.on:hover{color:#fff;}
+
+/* ── GRID ── */
+.listing-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:18px;
+}
+.lcard{
+  background:var(--sur);border:1px solid var(--line);border-radius:var(--r);
+  overflow:hidden;transition:transform .2s,box-shadow .2s,border-color .2s;
+  cursor:pointer;
+}
+.lcard:hover{transform:translateY(-4px);box-shadow:0 8px 28px rgba(0,0,0,.1);border-color:#d1d5db;}
+.lcard.feat{border-color:#fbbf24;box-shadow:0 0 0 1px #fbbf24 inset;}
+.lcard-img{
+  height:160px;display:flex;align-items:center;justify-content:center;
+  font-size:52px;background:linear-gradient(160deg,#f0fdf4,#ecfdf5);
+  position:relative;overflow:hidden;
+}
+.lcard-img img{width:100%;height:100%;object-fit:cover;}
+.fbadge{
+  position:absolute;top:8px;right:8px;
+  background:linear-gradient(90deg,#f59e0b,#d97706);
+  color:#fff;font-size:10px;font-weight:800;padding:4px 9px;border-radius:999px;
+}
+.sbadge{
+  position:absolute;inset:0;background:rgba(0,0,0,.5);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:15px;font-weight:800;
+}
+.lcard-body{padding:14px;}
+.lcard-cat{font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px;}
+.lcard-title{font-size:14.5px;font-weight:700;line-height:1.35;margin-bottom:6px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lcard-price{font-size:15px;font-weight:800;color:var(--green2);margin-bottom:5px;}
+.lcard-loc{font-size:11.5px;color:var(--ind);margin-bottom:5px;}
+.lcard-seller{font-size:11.5px;color:var(--dim);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:56px 20px;color:var(--dim);}
+.empty .ei{font-size:48px;margin-bottom:12px;}
+.empty p{font-size:15px;line-height:1.7;}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  font-weight:700;font-size:14px;padding:11px 20px;border-radius:10px;
+  transition:.15s;font-family:var(--font);
+}
+.btn-p{background:var(--green);color:#fff;box-shadow:0 3px 12px rgba(5,150,105,.25);}
+.btn-p:hover{filter:brightness(1.05);transform:translateY(-1px);}
+.btn-g{background:var(--sur);color:var(--ink);border:1.5px solid var(--line);}
+.btn-g:hover{border-color:var(--green);color:var(--green);}
+.btn-d{background:var(--redl);color:var(--red);border:1px solid #fca5a5;}
+.btn-b{width:100%;}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:8px;}
+
+/* ── FORM ── */
+.form-card{
+  background:var(--sur);border:1px solid var(--line);border-radius:18px;
+  padding:28px;max-width:700px;margin:0 auto;
+  box-shadow:0 4px 24px rgba(0,0,0,.06);
+}
+.form-card h2{font-size:20px;font-weight:800;margin-bottom:6px;}
+.form-card .sub{font-size:13.5px;color:var(--mid);margin-bottom:24px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:13px;font-weight:700;color:var(--mid);margin-bottom:6px;}
+.field input,.field textarea,.field select{
+  width:100%;padding:11px 14px;border-radius:10px;border:1.5px solid var(--line);
+  font-size:14px;color:var(--ink);background:#fafafa;transition:.15s;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:var(--green);background:#fff;outline:none;
+}
+.field textarea{resize:vertical;min-height:80px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:540px){.field-row{grid-template-columns:1fr;}}
+
+.commission-box{
+  background:var(--gl);border:1px solid #a7f3d0;border-radius:10px;
+  padding:13px 15px;margin-bottom:16px;font-size:13px;color:var(--green2);
+}
+.commission-live{display:flex;justify-content:space-between;margin-top:6px;font-weight:700;}
+
+.subbox{border:1.5px solid var(--line);border-radius:12px;padding:15px;margin-bottom:16px;}
+.subbox.on{border-color:#f59e0b;background:var(--ambl);}
+.subhead{display:flex;gap:11px;cursor:pointer;align-items:flex-start;}
+.subchk{
+  width:20px;height:20px;border-radius:6px;border:2px solid var(--line);
+  flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;
+  transition:.15s;
+}
+.subchk.on{background:#f59e0b;border-color:#f59e0b;}
+.subchk svg{width:11px;height:11px;color:#fff;opacity:0;}
+.subchk.on svg{opacity:1;}
+.sub-title{font-weight:800;font-size:14px;display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+.ptag{font-size:12px;font-weight:700;color:var(--amb);background:#fef3c7;padding:3px 9px;border-radius:999px;}
+.sub-desc{font-size:12.5px;color:var(--mid);margin-top:4px;line-height:1.65;}
+.sub-perks{margin-top:10px;padding-top:10px;border-top:1px dashed #e8c87a;display:none;}
+.subbox.on .sub-perks{display:block;}
+.sub-perks li{font-size:12.5px;color:var(--mid);padding:3px 0;display:flex;gap:6px;}
+
+.img-prev-wrap{position:relative;display:inline-block;margin-top:8px;}
+.img-prev-wrap img{width:90px;height:90px;object-fit:cover;border-radius:9px;border:1px solid var(--line);}
+.img-rem{
+  position:absolute;top:-6px;right:-6px;width:18px;height:18px;
+  background:var(--red);color:#fff;border-radius:50%;
+  font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;
+}
+
+/* ── MAP ── */
+#mapContainer{height:420px;border-radius:14px;border:1px solid var(--line);overflow:hidden;}
+
+/* ── ABOUT ── */
+.about-hero{
+  background:linear-gradient(135deg,var(--green),var(--green2));
+  color:#fff;border-radius:18px;padding:36px 28px;text-align:center;margin-bottom:28px;
+}
+.about-hero h2{font-size:24px;font-weight:900;letter-spacing:.5px;margin-bottom:10px;}
+.about-hero p{font-size:14.5px;opacity:.93;line-height:1.8;max-width:560px;margin:0 auto;}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;margin-bottom:28px;}
+.fcard{
+  background:var(--sur);border:1px solid var(--line);border-radius:var(--r);
+  padding:22px;transition:.2s;
+}
+.fcard:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.08);}
+.fcard-ico{
+  width:44px;height:44px;border-radius:11px;background:var(--gl);
+  display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:13px;
+}
+.fcard h3{font-size:15px;font-weight:800;margin-bottom:6px;}
+.fcard p{font-size:13px;color:var(--mid);line-height:1.7;}
+.rules-box{
+  background:var(--sur);border:1px solid var(--line);border-radius:var(--r);
+  padding:24px;margin-bottom:28px;
+}
+.rules-box h3{font-size:16px;font-weight:800;margin-bottom:14px;}
+.rules-box p{font-size:13.5px;color:var(--mid);line-height:1.85;margin-bottom:8px;}
+
+/* ── MODAL ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(17,24,39,.5);
+  backdrop-filter:blur(4px);display:none;
+  align-items:center;justify-content:center;z-index:300;padding:20px;
+}
+.overlay.on{display:flex;}
+.modal{
+  background:var(--sur);border-radius:18px;padding:28px;
+  max-width:460px;width:100%;max-height:90vh;overflow-y:auto;
+  box-shadow:0 20px 60px rgba(0,0,0,.18);
+}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:15px;}
+.msum{background:#f9fafb;border-radius:10px;padding:13px;margin-bottom:14px;}
+.msum .row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;color:var(--mid);}
+.msum .row.tot{border-top:1px solid var(--line);margin-top:6px;padding-top:8px;font-weight:800;color:var(--ink);}
+.macts{display:flex;gap:10px;margin-top:14px;}
+.macts .btn{flex:1;}
+
+/* bank grid */
+.bgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;}
+.bbtn{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:12px 6px;border-radius:10px;border:1.5px solid var(--line);
+  background:#fafafa;font-size:12px;font-weight:700;color:var(--mid);transition:.15s;
+}
+.bbtn:hover{border-color:var(--green);color:var(--green);background:var(--gl);}
+.bbtn .bi{font-size:22px;}
+
+/* chat */
+.chat-msgs{
+  max-height:260px;overflow-y:auto;display:flex;flex-direction:column;
+  gap:8px;margin-bottom:14px;padding:4px;
+}
+.bubble{max-width:76%;padding:9px 13px;border-radius:12px;font-size:13.5px;line-height:1.5;}
+.bubble .sn{font-size:11px;font-weight:700;opacity:.65;margin-bottom:2px;}
+.bubble.me{align-self:flex-start;background:var(--ind);color:#fff;border-bottom-left-radius:3px;}
+.bubble.them{align-self:flex-end;background:#f1f2f6;color:var(--ink);border-bottom-right-radius:3px;}
+.chat-input-row{display:flex;gap:8px;}
+.chat-input-row input{
+  flex:1;padding:10px 13px;border-radius:9px;border:1.5px solid var(--line);
+  font-family:var(--font);font-size:13.5px;
+}
+.chat-input-row input:focus{border-color:var(--ind);outline:none;}
+
+/* notif */
+.nitem{display:flex;gap:12px;padding:15px;border-bottom:1px solid var(--line);}
+.nitem:last-child{border:none;}
+.nitem.unread{background:#f0fdf9;}
+.nico{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.nico.g{background:var(--gl);}
+.nico.i{background:#eef2ff;}
+.ntitle{font-size:14px;font-weight:700;margin-bottom:3px;}
+.nbody{font-size:13px;color:var(--mid);line-height:1.55;}
+.ntime{font-size:11.5px;color:var(--dim);margin-top:3px;}
+.nbadge{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--red);color:#fff;font-size:10px;font-weight:800;
+  min-width:18px;height:18px;border-radius:999px;padding:0 4px;
+  margin-right:4px;vertical-align:middle;
+}
+
+/* admin */
+.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+.admin-table th,.admin-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;}
+.admin-table th{color:var(--mid);font-size:12px;font-weight:700;background:#f9fafb;}
+.spill{padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:700;}
+.spill.pending{background:#fef3c7;color:var(--amb);}
+.spill.confirmed{background:var(--gl);color:var(--green);}
+.spill.rejected{background:var(--redl);color:var(--red);}
+
+/* toast */
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(16px);
+  background:var(--ink);color:#fff;padding:12px 22px;border-radius:11px;
+  font-size:13.5px;font-weight:600;opacity:0;pointer-events:none;
+  transition:all .3s;z-index:999;white-space:nowrap;
+  box-shadow:0 8px 24px rgba(0,0,0,.2);
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* ── FOOTER ── */
+footer{
+  background:var(--ink);color:#d1d5db;
+  padding:40px 20px 24px;margin-top:auto;
+}
+.footer-inner{max-width:var(--max);margin:0 auto;}
+.footer-top{
+  display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:40px;
+  margin-bottom:32px;
+}
+@media(max-width:720px){.footer-top{grid-template-columns:1fr;gap:24px;}}
+.footer-logo{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.footer-logo .dot{
+  width:34px;height:34px;border-radius:9px;
+  background:linear-gradient(135deg,var(--green),var(--green2));
+  display:flex;align-items:center;justify-content:center;
+}
+.footer-logo .dot svg{width:17px;height:17px;color:#fff;}
+.footer-logo span{font-size:18px;font-weight:900;color:#fff;}
+.footer-logo span b{color:var(--green);}
+.footer-desc{font-size:13px;line-height:1.8;color:#9ca3af;max-width:280px;}
+.footer-col h4{font-size:14px;font-weight:800;color:#fff;margin-bottom:14px;}
+.footer-col ul{display:flex;flex-direction:column;gap:9px;}
+.footer-col li{font-size:13px;color:#9ca3af;cursor:pointer;transition:.15s;}
+.footer-col li:hover{color:var(--green);}
+.footer-divider{border:none;border-top:1px solid #374151;margin-bottom:20px;}
+.footer-bottom{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;font-size:12.5px;color:#6b7280;
+}
+.footer-bottom a{color:#6b7280;transition:.15s;}
+.footer-bottom a:hover{color:var(--green);}
+.footer-dev{
+  font-size:12.5px;color:#6b7280;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.footer-dev strong{color:#9ca3af;}
+.footer-dev .studio{color:var(--green);font-weight:800;}
+
+/* ── PAGE VIEWS ── */
+.page{display:none;}
+.page.on{display:block;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .hero{padding:36px 16px;}
+  section{padding:32px 0;}
+  .form-card{padding:20px 16px;}
+}
+.hidden{display:none!important;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hinner">
+    <div class="logo" onclick="showPage('home')" style="cursor:pointer;">
+      <div class="logo-dot">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M4 9L12 3L20 9V20H4V9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 20V13H15V20" stroke="currentColor" stroke-width="2"/></svg>
+      </div>
+      بازار<span>چه</span>
+    </div>
+    <nav>
+      <a class="nav-a on" onclick="showPage('home')">خانه</a>
+      <a class="nav-a" onclick="showPage('map')">نقشه</a>
+      <a class="nav-a" onclick="showPage('notif')">
+        اعلان‌ها <span class="nbadge hidden" id="headerBadge">0</span>
+      </a>
+      <a class="nav-a" onclick="showPage('about')">درباره ما</a>
+    </nav>
+    <button class="nav-post-btn" onclick="showPage('post')">+ ثبت آگهی رایگان</button>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a class="nav-a" onclick="showPage('home');closeMenu()">🏠 خانه</a>
+    <a class="nav-a" onclick="showPage('map');closeMenu()">🗺️ نقشه</a>
+    <a class="nav-a" onclick="showPage('notif');closeMenu()">🔔 اعلان‌ها</a>
+    <a class="nav-a" onclick="showPage('about');closeMenu()">ℹ️ درباره ما</a>
+    <a class="nav-a" onclick="showPage('post');closeMenu()">+ ثبت آگهی</a>
+  </div>
+</header>
+
+<!-- ══ HOME PAGE ══ -->
+<div class="page on" id="page-home">
+
+  <div class="hero">
+    <div class="wrap">
+      <h1>خرید و فروش وسایل،<br>سریع و آسان</h1>
+      <p>آگهی خود را رایگان ثبت کنید یا از میان صدها آگهی، کالای مورد نظرتان را پیدا کنید.</p>
+      <div class="hero-search">
+        <input type="text" id="searchInput" placeholder="جستجو کنید… مثلاً موبایل، لپ‌تاپ" oninput="onSearch(this.value)">
+        <button onclick="onSearch(document.getElementById('searchInput').value)">🔍 جستجو</button>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><div class="num" id="statTotal">0</div><div class="lbl">کل آگهی</div></div>
+        <div class="hstat"><div class="num" id="statActive">0</div><div class="lbl">آگهی فعال</div></div>
+        <div class="hstat"><div class="num" id="statSold">0</div><div class="lbl">فروخته شده</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <div class="sec-title">
+        <h2>آگهی‌های فعال</h2>
+        <span class="count-pill" id="countPill">۰ آگهی</span>
+      </div>
+      <div class="filter-row" id="filterRow"></div>
+      <div class="listing-grid" id="listingsGrid"></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══ MAP PAGE ══ -->
+<div class="page" id="page-map">
+  <section>
+    <div class="wrap">
+      <div class="sec-title"><h2>🗺️ نقشه آگهی‌ها</h2></div>
+      <p style="font-size:13.5px;color:var(--mid);margin-bottom:14px;">موقعیت تقریبی آگهی‌های دارای مکان روی نقشه نمایش داده می‌شود.</p>
+      <div id="mapContainer"></div>
+      <div id="mapBelow" style="margin-top:20px;"></div>
+    </div>
+  </section>
+</div>
+
+<!-- ══ POST PAGE ══ -->
+<div class="page" id="page-post">
+  <section>
+    <div class="wrap">
+      <div class="form-card">
+        <h2>ثبت آگهی جدید</h2>
+        <p class="sub">اطلاعات زیر را وارد کنید — ثبت آگهی کاملاً رایگان است.</p>
+
+        <form id="adForm" onsubmit="submitAd(event)">
+
+          <!-- اطلاعات فروشنده -->
+          <div style="background:var(--gl);border:1px solid #a7f3d0;border-radius:10px;padding:14px;margin-bottom:18px;">
+            <div style="font-size:13.5px;font-weight:800;color:var(--green2);margin-bottom:3px;">اطلاعات فروشنده</div>
+            <div style="font-size:12.5px;color:var(--mid);">اطلاعات شما فقط برای همین آگهی استفاده می‌شود.</div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>نام فروشنده *</label>
+              <input type="text" id="fName" placeholder="نام شما" required>
+            </div>
+            <div class="field">
+              <label>شماره موبایل *</label>
+              <input type="tel" id="fPhone" placeholder="09xxxxxxxxx" maxlength="11" required>
+            </div>
+          </div>
+
+          <!-- اطلاعات کالا -->
+          <div style="border-top:1px dashed var(--line);margin:6px 0 18px;"></div>
+
+          <div class="field">
+            <label>اسم وسیله *</label>
+            <input type="text" id="fTitle" placeholder="مثلاً: آیفون ۱۳، دوچرخه کوهستانی، یخچال سامسونگ…" required>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label>دسته‌بندی</label>
+              <select id="fCategory">
+                <option value="موبایل">📱 موبایل</option>
+                <option value="لپ‌تاپ">💻 لپ‌تاپ</option>
+                <option value="لوازم خانگی">🏠 لوازم خانگی</option>
+                <option value="خودرو">🚗 خودرو</option>
+                <option value="لباس">👕 لباس</option>
+                <option value="ورزشی">⚽ ورزشی</option>
+                <option value="کتاب">📚 کتاب</option>
+                <option value="سایر">📦 سایر</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>قیمت (تومان) *</label>
+              <input type="number" id="fPrice" min="0" placeholder="0" oninput="updateCom()" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>شهر / محله</label>
+            <input type="text" id="fCity" placeholder="مثلاً: تهران، مشهد، اصفهان…">
+          </div>
+
+          <div class="field">
+            <label>توضیحات</label>
+            <textarea id="fDesc" placeholder="وضعیت کالا، سن، جزئیات بیشتر…"></textarea>
+          </div>
+
+          <div class="field">
+            <label>عکس وسیله <span style="color:var(--dim);font-weight:400;">(اختیاری)</span></label>
+            <input type="file" id="fImage" accept="image/*" onchange="prevImg(this)">
+            <div id="imgWrap" class="hidden">
+              <div class="img-prev-wrap">
+                <img id="imgPrev" src="" alt="">
+                <button type="button" class="img-rem" onclick="rmImg()">✕</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="commission-box">
+            هنگام فروش موفق کالا، <strong>۵٪</strong> از مبلغ نهایی به‌عنوان کارمزد به بازارچه تعلق می‌گیرد.
+            <div class="commission-live">
+              <span>کارمزد تخمینی:</span>
+              <span id="comVal">۰ تومان</span>
+            </div>
+          </div>
+
+          <div class="subbox" id="subBox">
+            <div class="subhead" onclick="toggleSub()">
+              <div class="subchk" id="subChk">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 13L9 17L19 7" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div>
+                <div class="sub-title">اشتراک فروشنده ویژه <span class="ptag">۱۰۰,۰۰۰ تومان</span></div>
+                <div class="sub-desc">آگهی شما بالاتر از سایرین نمایش داده می‌شود</div>
+                <ul class="sub-perks">
+                  <li>⭐ نمایش در صدر نتایج جستجو</li>
+                  <li>🔥 دیده شدن بیشتر توسط خریداران</li>
+                  <li>🏅 نشان ویژه روی آگهی</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-p btn-b" style="font-size:15px;padding:14px;">ثبت آگهی</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══ NOTIFICATIONS PAGE ══ -->
+<div class="page" id="page-notif">
+  <section>
+    <div class="wrap">
+      <div class="sec-title">
+        <h2>🔔 اعلان‌ها</h2>
+        <button class="btn btn-g btn-sm" onclick="clearNotifs()">پاک کردن همه</button>
+      </div>
+      <div style="background:var(--sur);border:1px solid var(--line);border-radius:var(--r);">
+        <div id="notifList"></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══ ABOUT PAGE ══ -->
+<div class="page" id="page-about">
+  <section>
+    <div class="wrap">
+      <div class="about-hero">
+        <div style="font-size:52px;margin-bottom:14px;">💻</div>
+        <h2>SHADOW STUDIO</h2>
+        <p>گروه توسعه‌ی Shadow Studio با روش‌های نوین برنامه‌نویسی، بهترین برنامه‌ها را برای کاربران ارائه داده است.</p>
+      </div>
+
+      <div class="sec-title"><h2>🏪 درباره بازارچه</h2></div>
+      <p style="font-size:14px;color:var(--mid);line-height:1.85;margin-bottom:32px;">بازارچه یک بازار آنلاین ساده و کارآمد برای خرید و فروش وسایل دست دوم و کالاهای متنوع است. هدف ما ایجاد فضایی امن، شفاف و راحت برای خریداران و فروشندگان ایرانی است. هیچ ثبت‌نامی لازم نیست — فقط آگهی بگذار و بفروش.</p>
+
+      <div class="sec-title"><h2>⚙️ امکانات</h2></div>
+      <div class="feature-grid">
+        <div class="fcard"><div class="fcard-ico">📋</div><h3>ثبت آگهی رایگان</h3><p>ثبت آگهی برای همه کاربران کاملاً رایگان است. فقط اسم، شماره، عکس و اسم کالا کافیه.</p></div>
+        <div class="fcard"><div class="fcard-ico">⭐</div><h3>اشتراک ویژه</h3><p>با پرداخت ۱۰۰,۰۰۰ تومان آگهی شما در صدر نتایج نمایش داده می‌شود.</p></div>
+        <div class="fcard"><div class="fcard-ico">💬</div><h3>چت مستقیم</h3><p>خریداران می‌توانند مستقیماً با فروشنده در همان صفحه آگهی چت کنند.</p></div>
+        <div class="fcard"><div class="fcard-ico">🗺️</div><h3>نقشه آگهی‌ها</h3><p>موقعیت تقریبی کالاها روی نقشه OpenStreetMap قابل مشاهده است.</p></div>
+        <div class="fcard"><div class="fcard-ico">🔔</div><h3>اعلان‌ها</h3><p>اطلاع‌رسانی فوری هنگام ثبت آگهی، فروش و تأیید اشتراک ویژه.</p></div>
+        <div class="fcard"><div class="fcard-ico">🔐</div><h3>پنل ادمین</h3><p>مدیریت و تأیید پرداخت‌های اشتراک ویژه توسط مالک سایت.</p></div>
+      </div>
+
+      <div class="rules-box">
+        <h3>📜 قوانین و مقررات</h3>
+        <p>• ثبت آگهی رایگان و برای همه کاربران آزاد است.</p>
+        <p>• هنگام فروش موفق کالا، ۵٪ از مبلغ نهایی به‌عنوان کارمزد بازارچه کسر می‌شود.</p>
+        <p>• ثبت آگهی‌های فریب‌کارانه، غیرقانونی یا مغایر با اخلاق عمومی ممنوع است.</p>
+        <p>• مسئولیت صحت اطلاعات آگهی با فروشنده است.</p>
+        <p>• بازارچه حق دارد آگهی‌های مشکوک یا مغایر با قوانین را بدون اطلاع قبلی حذف کند.</p>
+        <p>• با استفاده از این سایت، تمامی قوانین فوق را می‌پذیرید.</p>
+      </div>
+
+      <div class="rules-box">
+        <h3>📞 تماس با ما</h3>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;"><span style="font-size:20px;">📧</span><span style="color:var(--mid);">shadow.studio@example.com</span></div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;"><span style="font-size:20px;">📱</span><span style="color:var(--mid);">@shadow_studio_ir (اینستاگرام)</span></div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;"><span style="font-size:20px;">💬</span><span style="color:var(--mid);">@shadow_studio (تلگرام)</span></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px;">
+        <button class="btn btn-g btn-sm" onclick="openAdmin()">🔐 ورود به پنل ادمین</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-logo">
+          <div class="dot">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M4 9L12 3L20 9V20H4V9Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 20V13H15V20" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <span>بازار<b>چه</b></span>
+        </div>
+        <p class="footer-desc">یک بازار آنلاین ساده برای خرید و فروش وسایل — بدون ثبت‌نام، بدون پیچیدگی.</p>
+      </div>
+      <div class="footer-col">
+        <h4>دسترسی سریع</h4>
+        <ul>
+          <li onclick="showPage('home')">خانه</li>
+          <li onclick="showPage('post')">ثبت آگهی</li>
+          <li onclick="showPage('map')">نقشه آگهی‌ها</li>
+          <li onclick="showPage('about')">درباره ما</li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>دسته‌بندی‌ها</h4>
+        <ul>
+          <li onclick="setFilter('موبایل');showPage('home')">📱 موبایل</li>
+          <li onclick="setFilter('لپ‌تاپ');showPage('home')">💻 لپ‌تاپ</li>
+          <li onclick="setFilter('خودرو');showPage('home')">🚗 خودرو</li>
+          <li onclick="setFilter('لوازم خانگی');showPage('home')">🏠 لوازم خانگی</li>
+        </ul>
+      </div>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-bottom">
+      <span>© ۱۴۰۴ بازارچه — تمامی حقوق محفوظ است.</span>
+      <div class="footer-dev">
+        <span>مالک سایت: <strong>بازارچه</strong></span>
+        <span style="color:#374151;">|</span>
+        <span>توسعه‌دهنده: <strong>پارسا سعیدی</strong> — <span class="studio">SHADOW STUDIO</span></span>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══ MODALS ══ -->
+
+<!-- Detail -->
+<div class="overlay" id="detailOverlay">
+  <div class="modal" style="max-width:520px;" id="detailBox"></div>
+</div>
+
+<!-- Payment -->
+<div class="overlay" id="payOverlay">
+  <div class="modal">
+    <div id="pStep1">
+      <div class="modal-title">💳 انتخاب موبایل بانک</div>
+      <p style="font-size:13px;color:var(--mid);margin-bottom:12px;">مبلغ اشتراک ویژه <strong>۱۰۰,۰۰۰ تومان</strong> است. بانک مبدأ خود را انتخاب کنید:</p>
+      <div class="bgrid" id="bankGrid"></div>
+      <div class="macts"><button class="btn btn-g" onclick="closeOverlay('payOverlay')">انصراف</button></div>
+    </div>
+    <div id="pStep2" class="hidden">
+      <div class="modal-title">واریز از <span id="selBankName"></span></div>
+      <p style="font-size:13px;color:var(--mid);margin-bottom:13px;">شماره حساب مقصد را کپی کرده در اپ بانک پیست کنید، سپس کد پیگیری را وارد کنید:</p>
+      <div class="msum">
+        <div class="row"><span>مبلغ</span><span>۱۰۰,۰۰۰ تومان</span></div>
+        <div class="row"><span>شماره شبا مقصد</span><span>•••• •••• •••• ••••</span></div>
+      </div>
+      <button class="btn btn-p btn-b" onclick="copyIban()" style="margin-bottom:14px;">
+        📋 کپی شماره حساب
+      </button>
+      <div class="field"><label>کد پیگیری تراکنش</label><input type="text" id="trackInput" placeholder="مثلاً: 123456789"></div>
+      <div class="macts">
+        <button class="btn btn-g" onclick="pStep(1)">بازگشت</button>
+        <button class="btn btn-p" onclick="submitTracking()">ارسال برای تأیید</button>
+      </div>
+      <p style="font-size:11.5px;color:var(--dim);margin-top:12px;line-height:1.7;">پس از ارسال، آگهی شما «در انتظار تأیید» قرار می‌گیرد و بعد از بررسی مالک سایت، به‌صورت ویژه نمایش داده می‌شود.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Sold -->
+<div class="overlay" id="soldOverlay">
+  <div class="modal">
+    <div class="modal-title">ثبت فروش کالا</div>
+    <div class="msum" id="soldSum"></div>
+    <div class="macts">
+      <button class="btn btn-g" onclick="closeOverlay('soldOverlay')">انصراف</button>
+      <button class="btn btn-p" onclick="confirmSold()">تأیید فروش</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chat -->
+<div class="overlay" id="chatOverlay">
+  <div class="modal">
+    <div class="modal-title" id="chatTitle">💬 چت</div>
+    <p id="chatSub" style="font-size:13px;color:var(--mid);margin-bottom:13px;"></p>
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="field"><input type="text" id="chatName" placeholder="نام شما"></div>
+    <div class="chat-input-row">
+      <input type="text" id="chatInput" placeholder="پیام خود را بنویسید…" onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn btn-p btn-sm" onclick="sendChat()">ارسال</button>
+    </div>
+    <button class="btn btn-g btn-b" onclick="closeOverlay('chatOverlay')" style="margin-top:12px;">بستن</button>
+  </div>
+</div>
+
+<!-- Admin -->
+<div class="overlay" id="adminOverlay">
+  <div class="modal" style="max-width:700px;">
+    <div class="modal-title">🔐 پنل ادمین — درخواست‌های اشتراک ویژه</div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead><tr><th>کالا</th><th>فروشنده</th><th>بانک</th><th>کد پیگیری</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+        <tbody id="adminBody"></tbody>
+      </table>
+    </div>
+    <button class="btn btn-g btn-b" onclick="closeOverlay('adminOverlay')" style="margin-top:16px;">بستن</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══ SCRIPT ══ -->
+<script>
+'use strict';
+
+const IBAN = 'IR5022291542742380';
+const ADMIN_PASS = 'admin1234';
+const SK = 'baz_site_v1';
+const CATS = ['موبایل','لپ‌تاپ','لوازم خانگی','خودرو','لباس','ورزشی','کتاب','سایر'];
+const EMO = {'موبایل':'📱','لپ‌تاپ':'💻','لوازم خانگی':'🏠','خودرو':'🚗','لباس':'👕','ورزشی':'⚽','کتاب':'📚','سایر':'📦'};
+const BANKS = [
+  {n:'ملی',e:'🏦'},{n:'ملت',e:'🏦'},{n:'صادرات',e:'🏦'},
+  {n:'تجارت',e:'🏦'},{n:'سامان',e:'🏦'},{n:'پاسارگاد',e:'🏦'},
+  {n:'پارسیان',e:'🏦'},{n:'رفاه',e:'🏦'},{n:'سایر',e:'💳'}
+];
+const CITIES = {
+  'تهران':[35.69,51.39],'مشهد':[36.29,59.61],'اصفهان':[32.66,51.67],
+  'شیراز':[29.59,52.58],'تبریز':[38.08,46.30],'کرج':[35.84,50.94],
+  'اهواز':[31.32,48.67],'قم':[34.64,50.88],'رشت':[37.28,49.58],
+  'کرمانشاه':[34.31,47.06],'ارومیه':[37.55,45.07],'زاهدان':[29.49,60.86]
+};
+
+let listings=[], notifs=[], filter='همه', search='', pendingL=null, pendingSold=null, chatId=null, selBank=null, subOn=false, imgData=null, mapInst=null;
+
+/* ── storage ── */
+function sv(){try{localStorage.setItem(SK,JSON.stringify({listings,notifs}));}catch(e){}}
+function ld(){try{const v=localStorage.getItem(SK);if(v){const d=JSON.parse(v);listings=d.listings||[];notifs=d.notifs||[];}}catch(e){}}
+
+/* ── helpers ── */
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function fmt(n){return Number(n||0).toLocaleString('en-US');}
+function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+function ago(t){const d=(Date.now()-t)/1000;if(d<60)return 'لحظاتی پیش';if(d<3600)return Math.floor(d/60)+' دقیقه پیش';if(d<86400)return Math.floor(d/3600)+' ساعت پیش';return Math.floor(d/86400)+' روز پیش';}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),2800);}
+
+/* ── init ── */
+function init(){
+  ld();
+  buildBanks();
+  buildFilters();
+  renderGrid();
+  updateStats();
+  updateBadge();
+}
+window.addEventListener('DOMContentLoaded',init);
+
+/* ── page routing ── */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.getElementById('page-'+name)?.classList.add('on');
+  document.querySelectorAll('.nav-a').forEach(a=>a.classList.remove('on'));
+  document.querySelectorAll('.nav-a').forEach(a=>{
+    if(a.textContent.trim().includes({home:'خانه',map:'نقشه',notif:'اعلان',about:'درباره'}[name]||''))
+      a.classList.add('on');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='map') setTimeout(initMap,120);
+  if(name==='notif'){renderNotifs();updateBadge();}
+}
+
+/* ── mobile menu ── */
+function toggleMenu(){document.getElementById('mobileNav').classList.toggle('open');}
+function closeMenu(){document.getElementById('mobileNav').classList.remove('open');}
+
+/* ── filters ── */
+function buildFilters(){
+  const row=document.getElementById('filterRow');
+  row.innerHTML=['همه',...CATS].map(c=>`<button class="chip${c===filter?' on':''}" onclick="setFilter('${c}')">${c}</button>`).join('');
+}
+function setFilter(c){filter=c;buildFilters();renderGrid();}
+function onSearch(v){search=v.trim().toLowerCase();renderGrid();}
+
+/* ── grid ── */
+function renderGrid(){
+  const g=document.getElementById('listingsGrid');
+  if(!g) return;
+  const items=listings
+    .filter(l=>filter==='همه'||l.cat===filter)
+    .filter(l=>!search||l.title.toLowerCase().includes(search)||(l.desc||'').toLowerCase().includes(search)||(l.city||'').toLowerCase().includes(search))
+    .sort((a,b)=>(a.feat===b.feat)?b.ts-a.ts:a.feat?-1:1);
+
+  const c=document.getElementById('countPill');
+  if(c) c.textContent=items.length.toLocaleString('fa-IR')+' آگهی';
+
+  if(!items.length){
+    g.innerHTML='<div class="empty" style="grid-column:1/-1;"><div class="ei">🗂️</div><p>آگهی‌ای یافت نشد.<br>اولین نفری باشید که آگهی ثبت می‌کنید!</p></div>';
+    return;
+  }
+  g.innerHTML=items.map(l=>`
+    <div class="lcard${l.feat?' feat':''}${l.sold?' sold':''}" onclick="openDetail('${l.id}')">
+      <div class="lcard-img">
+        ${l.img?`<img src="${l.img}" loading="lazy">`:(EMO[l.cat]||'📦')}
+        ${l.feat?`<span class="fbadge">⭐ ویژه</span>`:''}
+        ${l.sold?`<span class="sbadge">فروخته شد</span>`:''}
+      </div>
+      <div class="lcard-body">
+        <div class="lcard-cat">${l.cat}</div>
+        <div class="lcard-title">${esc(l.title)}</div>
+        <div class="lcard-price">${fmt(l.price)} تومان</div>
+        ${l.city?`<div class="lcard-loc">📍 ${esc(l.city)}</div>`:''}
+        <div class="lcard-seller">👤 ${esc(l.seller)}</div>
+      </div>
+    </div>`).join('');
+}
+
+/* ── stats ── */
+function updateStats(){
+  const t=document.getElementById('statTotal');
+  const a=document.getElementById('statActive');
+  const s=document.getElementById('statSold');
+  if(t) t.textContent=listings.length.toLocaleString('fa-IR');
+  if(a) a.textContent=listings.filter(l=>!l.sold).length.toLocaleString('fa-IR');
+  if(s) s.textContent=listings.filter(l=>l.sold).length.toLocaleString('fa-IR');
+}
+
+/* ── detail ── */
+function openDetail(id){
+  const l=listings.find(x=>x.id===id); if(!l) return;
+  const com=Math.round(l.price*.05);
+  document.getElementById('detailBox').innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <span style="font-size:11px;font-weight:700;color:var(--green);background:var(--gl);padding:4px 10px;border-radius:999px;">${l.cat}</span>
+      ${l.feat?`<span style="font-size:11px;font-weight:800;color:var(--amb);background:#fef3c7;padding:4px 10px;border-radius:999px;">⭐ ویژه</span>`:''}
+    </div>
+    ${l.img
+      ?`<img src="${l.img}" style="width:100%;height:220px;object-fit:cover;border-radius:12px;margin-bottom:16px;">`
+      :`<div style="height:100px;font-size:60px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">${EMO[l.cat]||'📦'}</div>`}
+    <h2 style="font-size:19px;font-weight:800;margin-bottom:8px;">${esc(l.title)}</h2>
+    <div style="font-size:22px;font-weight:900;color:var(--green2);margin-bottom:12px;">${fmt(l.price)} تومان</div>
+    ${l.desc?`<p style="font-size:13.5px;color:var(--mid);line-height:1.8;margin-bottom:14px;">${esc(l.desc)}</p>`:''}
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+      <span style="background:#f1f5f9;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;">👤 ${esc(l.seller)}</span>
+      <span style="background:#f1f5f9;border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;">📱 ${esc(l.phone)}</span>
+      ${l.city?`<span style="background:#eef2ff;color:var(--ind);border-radius:8px;padding:6px 12px;font-size:13px;font-weight:600;">📍 ${esc(l.city)}</span>`:''}
+    </div>
+    <div style="background:#f9fafb;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--mid);">
+      کارمزد بازارچه هنگام فروش: <strong>${fmt(com)} تومان (۵٪)</strong>
+    </div>
+    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:10px;">
+      ${!l.sold?`<button class="btn btn-p" onclick="closeOverlay('detailOverlay');openChat('${l.id}')">💬 چت با فروشنده</button>`:''}
+      ${!l.sold?`<button class="btn btn-g" onclick="closeOverlay('detailOverlay');openSold('${l.id}')">ثبت فروش</button>`:''}
+      <button class="btn btn-d btn-sm" onclick="delListing('${l.id}')">🗑️ حذف آگهی</button>
+    </div>
+    <button class="btn btn-g btn-b" onclick="closeOverlay('detailOverlay')" style="margin-top:4px;">بستن</button>`;
+  openOverlay('detailOverlay');
+}
+
+function delListing(id){
+  if(!confirm('آیا مطمئن هستید؟')) return;
+  listings=listings.filter(l=>l.id!==id);
+  sv(); closeOverlay('detailOverlay'); renderGrid(); updateStats(); toast('آگهی حذف شد');
+}
+
+/* ── post ad ── */
+function updateCom(){
+  const p=parseFloat(document.getElementById('fPrice').value)||0;
+  document.getElementById('comVal').textContent=fmt(Math.round(p*.05))+' تومان';
+}
+function prevImg(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=e=>{
+    const i=new Image(); i.onload=()=>{
+      const c=document.createElement('canvas'),s=Math.min(1,600/i.width);
+      c.width=i.width*s; c.height=i.height*s;
+      c.getContext('2d').drawImage(i,0,0,c.width,c.height);
+      imgData=c.toDataURL('image/jpeg',.75);
+      document.getElementById('imgPrev').src=imgData;
+      document.getElementById('imgWrap').classList.remove('hidden');
+    }; i.src=e.target.result;
+  }; r.readAsDataURL(f);
+}
+function rmImg(){imgData=null;document.getElementById('fImage').value='';document.getElementById('imgWrap').classList.add('hidden');}
+function toggleSub(){
+  subOn=!subOn;
+  document.getElementById('subBox').classList.toggle('on',subOn);
+  document.getElementById('subChk').classList.toggle('on',subOn);
+}
+
+function submitAd(e){
+  e.preventDefault();
+  const name=document.getElementById('fName').value.trim();
+  const phone=document.getElementById('fPhone').value.trim();
+  const title=document.getElementById('fTitle').value.trim();
+  const price=parseFloat(document.getElementById('fPrice').value)||0;
+  const cat=document.getElementById('fCategory').value;
+  const city=document.getElementById('fCity').value.trim();
+  const desc=document.getElementById('fDesc').value.trim();
+
+  if(!name){toast('نام فروشنده را وارد کنید');return;}
+  if(!phone||phone.length!==11||!phone.startsWith('09')){toast('شماره موبایل باید ۱۱ رقم و با ۰۹ شروع شود');return;}
+  if(!title){toast('اسم وسیله را وارد کنید');return;}
+  if(price<=0){toast('قیمت را وارد کنید');return;}
+
+  let lat=null,lng=null;
+  if(city){
+    const k=Object.keys(CITIES).find(c=>city.includes(c));
+    if(k){lat=CITIES[k][0]+(Math.random()-.5)*.08;lng=CITIES[k][1]+(Math.random()-.5)*.08;}
+  }
+
+  pendingL={
+    id:uid(),title,cat,price,desc,city,lat,lng,
+    seller:name,phone,img:imgData,
+    feat:false,sold:false,ts:Date.now(),msgs:[],pr:null
+  };
+
+  if(subOn){openOverlay('payOverlay');pStep(1);}
+  else{finalPost(false,null);}
+}
+
+function finalPost(feat,pr){
+  pendingL.feat=feat; pendingL.pr=pr;
+  listings.push(pendingL); sv();
+  addNotif('g','📋','آگهی ثبت شد',`آگهی "${pendingL.title}" با موفقیت ثبت شد.`);
+  if(pr) addNotif('i','⏳','در انتظار تأیید پرداخت','اشتراک ویژه شما پس از بررسی فعال می‌شود.');
+  pendingL=null; imgData=null; subOn=false;
+  document.getElementById('adForm').reset();
+  document.getElementById('imgWrap').classList.add('hidden');
+  document.getElementById('subBox').classList.remove('on');
+  document.getElementById('subChk').classList.remove('on');
+  document.getElementById('comVal').textContent='۰ تومان';
+  renderGrid(); updateStats(); updateBadge();
+  showPage('home'); toast('✅ آگهی با موفقیت ثبت شد');
+}
+
+/* ── payment ── */
+function buildBanks(){
+  const g=document.getElementById('bankGrid'); if(!g) return;
+  g.innerHTML=BANKS.map(b=>`<button class="bbtn" onclick="selBankFn('${b.n}')"><span class="bi">${b.e}</span>بانک ${b.n}</button>`).join('');
+}
+function selBankFn(n){selBank=n;document.getElementById('selBankName').textContent='بانک '+n;pStep(2);}
+function pStep(n){
+  document.getElementById('pStep1').classList.toggle('hidden',n!==1);
+  document.getElementById('pStep2').classList.toggle('hidden',n!==2);
+}
+async function copyIban(){
+  try{await navigator.clipboard.writeText(IBAN);toast('شماره حساب کپی شد — در اپ بانک پیست کنید');}
+  catch(e){toast('کپی انجام نشد');}
+}
+function submitTracking(){
+  const code=document.getElementById('trackInput').value.trim();
+  if(!code){toast('کد پیگیری را وارد کنید');return;}
+  closeOverlay('payOverlay');
+  document.getElementById('trackInput').value='';
+  finalPost(false,{bank:selBank||'نامشخص',code,status:'pending',ts:Date.now()});
+  toast('درخواست ارسال شد — منتظر تأیید ادمین باشید');
+}
+
+/* ── sold ── */
+function openSold(id){
+  pendingSold=id;
+  const l=listings.find(x=>x.id===id); if(!l) return;
+  const c=Math.round(l.price*.05);
+  document.getElementById('soldSum').innerHTML=`
+    <div class="row"><span>مبلغ فروش</span><span>${fmt(l.price)} تومان</span></div>
+    <div class="row"><span>کارمزد بازارچه (۵٪)</span><span>${fmt(c)} تومان</span></div>
+    <div class="row tot"><span>مبلغ نهایی شما</span><span>${fmt(l.price-c)} تومان</span></div>`;
+  openOverlay('soldOverlay');
+}
+function confirmSold(){
+  const l=listings.find(x=>x.id===pendingSold);
+  if(l){
+    l.sold=true; sv(); renderGrid(); updateStats();
+    addNotif('g','🎉','فروش موفق!',`کالای "${l.title}" فروخته شد.`);
+    updateBadge(); toast('فروش ثبت شد');
+  }
+  closeOverlay('soldOverlay'); pendingSold=null;
+}
+
+/* ── chat ── */
+function openChat(id){
+  chatId=id; const l=listings.find(x=>x.id===id); if(!l) return;
+  document.getElementById('chatTitle').textContent='💬 چت: '+l.title;
+  document.getElementById('chatSub').textContent='فروشنده: '+l.seller+' · '+l.phone;
+  renderChat(l); openOverlay('chatOverlay');
+}
+function renderChat(l){
+  const el=document.getElementById('chatMsgs');
+  if(!l.msgs||!l.msgs.length){el.innerHTML='<div class="empty" style="padding:14px 0;"><p>هنوز پیامی ارسال نشده</p></div>';return;}
+  el.innerHTML=l.msgs.map(m=>`<div class="bubble ${m.s===l.seller?'them':'me'}"><div class="sn">${esc(m.s)}</div>${esc(m.t)}</div>`).join('');
+  el.scrollTop=el.scrollHeight;
+}
+function sendChat(){
+  const n=document.getElementById('chatName').value.trim();
+  const t=document.getElementById('chatInput').value.trim();
+  if(!n||!t){toast('نام و پیام را وارد کنید');return;}
+  const l=listings.find(x=>x.id===chatId); if(!l) return;
+  if(!l.msgs)l.msgs=[];
+  l.msgs.push({s:n,t,ts:Date.now()}); sv(); renderChat(l);
+  document.getElementById('chatInput').value='';
+}
+
+/* ── notifs ── */
+function addNotif(type,icon,title,body){
+  notifs.unshift({id:uid(),type,icon,title,body,ts:Date.now(),read:false}); sv(); updateBadge();
+}
+function updateBadge(){
+  const u=notifs.filter(n=>!n.read).length;
+  const b=document.getElementById('headerBadge'); if(!b) return;
+  b.textContent=u||''; b.classList.toggle('hidden',u===0);
+}
+function renderNotifs(){
+  const el=document.getElementById('notifList'); if(!el) return;
+  notifs.forEach(n=>n.read=true); sv(); updateBadge();
+  if(!notifs.length){el.innerHTML='<div class="empty"><div class="ei">🔔</div><p>هنوز اعلانی ندارید</p></div>';return;}
+  el.innerHTML=notifs.map(n=>`
+    <div class="nitem${n.read?'':' unread'}">
+      <div class="nico ${n.type}">${n.icon}</div>
+      <div>
+        <div class="ntitle">${esc(n.title)}</div>
+        <div class="nbody">${esc(n.body)}</div>
+        <div class="ntime">${ago(n.ts)}</div>
+      </div>
+    </div>`).join('');
+}
+function clearNotifs(){notifs=[];sv();renderNotifs();updateBadge();}
+
+/* ── map ── */
+function initMap(){
+  const el=document.getElementById('mapContainer'); if(!el||el._leaflet_id) return;
+  mapInst=L.map('mapContainer').setView([33,53],5);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap',maxZoom:18}).addTo(mapInst);
+  const active=listings.filter(l=>!l.sold&&l.lat);
+  active.forEach(l=>{
+    const ic=L.divIcon({className:'',html:`<div style="background:var(--green);color:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 2px 8px rgba(0,0,0,.25);">${EMO[l.cat]||'📦'}</div>`,iconSize:[32,32],iconAnchor:[16,16]});
+    L.marker([l.lat,l.lng],{icon:ic}).addTo(mapInst)
+      .bindPopup(`<div style="font-family:Vazirmatn,sans-serif;direction:rtl;min-width:140px;"><b style="font-size:13px;">${esc(l.title)}</b><br><span style="color:#059669;font-weight:700;">${fmt(l.price)} تومان</span></div>`);
+  });
+  const below=document.getElementById('mapBelow');
+  if(!active.length&&below){
+    below.innerHTML='<div class="empty"><div class="ei">🗺️</div><p>هنوز آگهی با موقعیت جغرافیایی ثبت نشده.<br>هنگام ثبت آگهی، شهر خود را وارد کنید.</p></div>';
+    return;
+  }
+  if(below&&active.length){
+    below.innerHTML=`<h3 style="font-size:15px;font-weight:800;margin-bottom:14px;">آگهی‌های دارای موقعیت (${active.length})</h3>`+
+      `<div class="listing-grid">${active.map(l=>`
+        <div class="lcard" onclick="openDetail('${l.id}')">
+          <div class="lcard-img">${l.img?`<img src="${l.img}" loading="lazy">`:(EMO[l.cat]||'📦')}</div>
+          <div class="lcard-body">
+            <div class="lcard-cat">${l.cat}</div>
+            <div class="lcard-title">${esc(l.title)}</div>
+            <div class="lcard-price">${fmt(l.price)} تومان</div>
+            <div class="lcard-loc">📍 ${esc(l.city||'')}</div>
+          </div>
+        </div>`).join('')}</div>`;
+  }
+}
+
+/* ── admin ── */
+function openAdmin(){
+  const p=prompt('رمز ادمین:'); if(p!==ADMIN_PASS){if(p!==null)toast('رمز اشتباه است');return;}
+  renderAdminTable(); openOverlay('adminOverlay');
+}
+function renderAdminTable(){
+  const reqs=listings.filter(l=>l.pr);
+  const tb=document.getElementById('adminBody');
+  if(!reqs.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--dim);padding:24px;">درخواستی ثبت نشده</td></tr>';return;}
+  tb.innerHTML=reqs.map(l=>`
+    <tr>
+      <td>${esc(l.title)}</td>
+      <td>${esc(l.seller)}<br><small style="color:var(--dim)">${esc(l.phone)}</small></td>
+      <td>${esc(l.pr.bank)}</td>
+      <td style="font-family:monospace;">${esc(l.pr.code)}</td>
+      <td><span class="spill ${l.pr.status}">${{pending:'در انتظار',confirmed:'تأیید شد',rejected:'رد شد'}[l.pr.status]}</span></td>
+      <td>
+        ${l.pr.status==='pending'?`
+          <button class="btn btn-p btn-sm" onclick="adApprove('${l.id}')" style="margin-left:4px;">تأیید</button>
+          <button class="btn btn-d btn-sm" onclick="adReject('${l.id}')">رد</button>
+        `:'—'}
+      </td>
+    </tr>`).join('');
+}
+function adApprove(id){
+  const l=listings.find(x=>x.id===id); if(!l) return;
+  l.pr.status='confirmed'; l.feat=true; sv(); renderGrid(); renderAdminTable();
+  addNotif('g','⭐','اشتراک ویژه تأیید شد',`آگهی "${l.title}" به‌صورت ویژه نمایش داده می‌شود.`);
+  updateBadge(); toast('اشتراک تأیید و فعال شد');
+}
+function adReject(id){
+  const l=listings.find(x=>x.id===id); if(!l) return;
+  l.pr.status='rejected'; sv(); renderAdminTable(); toast('درخواست رد شد');
+}
+
+/* ── modal helpers ── */
+function openOverlay(id){document.getElementById(id)?.classList.add('on');}
+function closeOverlay(id){document.getElementById(id)?.classList.remove('on');}
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{if(e.target===o)o.classList.remove('on');});
+});
+</script>
+</body>
+</html>
